@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مساعد ومحاكي نشر صفحات HTML عبر GitHub Pages</title>
+
+  <!-- Tailwind CSS & Canvas Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts: Tajawal & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #090d16 50%, #020617 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+    }
+
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card-interactive {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .glass-card-interactive:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 12px 28px -6px rgba(56, 189, 248, 0.2);
+    }
+
+    /* GitHub Simulation UI */
+    .github-window {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+    }
+    .github-header-bar {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+
+    /* Pulse Glow */
+    .pulse-live-badge {
+      animation: livePulse 2s infinite ease-in-out;
+    }
+    @keyframes livePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      50% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+    }
+
+    /* Step Tab Indicator */
+    .step-nav-btn.active-tab {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
+      color: #ffffff !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 8px 20px -4px rgba(2, 132, 199, 0.5) !important;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 flex justify-center">
+
+  <div class="w-full max-w-5xl flex flex-col gap-6">
+
+    <!-- Header Banner -->
+    <header class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-sky-500/30">
+      <div class="absolute -top-14 -left-14 w-60 h-60 bg-sky-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-14 -right-14 w-60 h-60 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-right">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-black mb-3">
+            <span>🚀</span>
+            <span>دليل النشر التفاعلي الذكي • GitHub Pages</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight">
+            كيف تحول كود وملف <span class="text-sky-400 code-font">HTML</span> إلى رابط ويب مباشر؟
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm font-medium mt-2 max-w-2xl leading-relaxed">
+            محاكي تطبيقي يقودك خطوة بخطوة من تسمية الملف الصحيحة، وصولاً إلى استلام رابط موقعك الدائم المجاني ومشاركته مع طلابك فوراً.
+          </p>
+        </div>
+
+        <!-- GitHub Octocat Icon Box -->
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-slate-900/90 flex flex-col items-center justify-center text-white shadow-2xl border-2 border-sky-400/40 shrink-0 transform hover:scale-105 transition duration-300">
+          <svg class="w-12 h-12 text-slate-200" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="text-[9px] font-black tracking-widest text-emerald-400 mt-1">PAGES LIVE</span>
+        </div>
+      </div>
+
+      <!-- Navigation Steps Tab Bar -->
+      <nav class="flex items-center gap-2 mt-6 pt-5 border-t border-slate-700/60 flex-wrap" id="stepNavBar">
+        <button onclick="goToStage(1)" id="stage-btn-1" class="step-nav-btn active-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>1️⃣</span>
+          <span>تسمية الملف (index.html) ⚠️</span>
+        </button>
+        <button onclick="goToStage(2)" id="stage-btn-2" class="step-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>2️⃣</span>
+          <span>إنشاء ورفع الملف للمستودع 📁</span>
+        </button>
+        <button onclick="goToStage(3)" id="stage-btn-3" class="step-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>3️⃣</span>
+          <span>تفعيل خدمة GitHub Pages ⚙️</span>
+        </button>
+        <button onclick="goToStage(4)" id="stage-btn-4" class="step-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>4️⃣</span>
+          <span>الشريط الملون واستلام الرابط 🌐</span>
+        </button>
+        <button onclick="goToStage(5)" id="stage-btn-5" class="step-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+          <span>🧮</span>
+          <span>حاسبة الرابط المباشر لمستودعك</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- STAGE 1: FILE RENAMING VALIDATION (القاعدة الذهبية) -->
+    <section id="stage-sec-1" class="stage-container glass-card rounded-3xl p-6 sm:p-8">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg">1</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">الخطوة الأولى: القاعدة الإجبارية (تسمية الملف)</h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-bold">لماذا لم يفتح الرابط تلقائياً حتى الآن؟ وكيف تحل المشكلة فوراً؟</p>
+          </div>
+        </div>
+        <span class="text-3xl">✏️</span>
+      </div>
+
+      <!-- Problem Explanation Box -->
+      <div class="p-4 rounded-2xl bg-rose-950/60 border-2 border-rose-500/40 mb-6 flex items-start gap-3.5">
+        <span class="text-3xl shrink-0">⚠️</span>
+        <div>
+          <h3 class="font-black text-rose-300 text-sm sm:text-base">سبب عدم عمل الرابط في الصورة السابقة:</h3>
+          <p class="text-xs sm:text-sm text-rose-100 font-medium mt-1 leading-relaxed">
+            في مستودعك كان اسم الملف طويلاً جداً: <code class="code-font text-rose-300 bg-rose-900/60 px-2 py-0.5 rounded border border-rose-500/30">how_long_vs_how_many_comprehensive_gram...</code><br>
+            سيرفرات الويب لا تفتح هذا الملف تلقائياً. <strong>القاعدة العالمية هي:</strong> يجب أن يكون اسم الملف الرئيسي هو 
+            <span class="code-font bg-emerald-500 text-slate-950 px-2.5 py-0.5 rounded-lg text-xs sm:text-sm font-black mx-1">index.html</span>
+            بأحرف صغيرة وبدون أي مسافات.
+          </p>
+        </div>
+      </div>
+
+      <!-- Interactive Filename Checker Tool -->
+      <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-700/80 mb-6">
+        <h4 class="font-black text-sm text-sky-400 mb-2 flex items-center gap-2">
+          <span>🔍</span>
+          <span>أداة فحص وتصحيح اسم الملف قبل رفعه:</span>
+        </h4>
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <input type="text" id="testFileNameInput" value="how_long_vs_how_many_quiz.html" oninput="validateFileName()" class="flex-1 w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-sky-400 code-font text-xs sm:text-sm text-white text-left font-bold" dir="ltr">
+          <button onclick="fixFileNameAuto()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md transition active:scale-95 shrink-0 flex items-center gap-1.5 w-full sm:w-auto justify-center">
+            <span>✨</span>
+            <span>تصحيح إلى index.html تلقائياً</span>
+          </button>
+        </div>
+        <div id="fileNameFeedback" class="mt-2.5 text-xs font-bold text-rose-400 flex items-center gap-1.5">
+          <span>⚠️ هذا الاسم لن يفتح تلقائياً في المتصفح! اضغط على زر التصحيح.</span>
+        </div>
+      </div>
+
+      <!-- How to Rename directly inside GitHub without re-uploading -->
+      <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+        <h4 class="font-black text-base text-white">كيف تعدل اسم الملف الآن داخل موقع GitHub بضغطة زر؟</h4>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 my-2">
+          <div class="p-4 rounded-2xl glass-card-interactive flex flex-col justify-between">
+            <div>
+              <span class="w-7 h-7 rounded-xl bg-sky-500/20 text-sky-400 font-black text-xs flex items-center justify-center mb-2">أ</span>
+              <h5 class="font-black text-white text-sm">انقر على اسم الملف</h5>
+              <p class="text-xs text-slate-400 mt-1">
+                داخل مستودعك، اضغط على اسم الملف الطويل لفتحه وعرض الكود.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl glass-card-interactive flex flex-col justify-between">
+            <div>
+              <span class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center mb-2">ب</span>
+              <h5 class="font-black text-white text-sm">اضغط على زر القلم (Edit ✏️)</h5>
+              <p class="text-xs text-slate-400 mt-1">
+                في أعلى يمين الكود ستجد أيقونة القلم؛ اضغط عليها للتعديل.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl glass-card-interactive flex flex-col justify-between">
+            <div>
+              <span class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center mb-2">ج</span>
+              <h5 class="font-black text-white text-sm">امسح الاسم واكتب index.html</h5>
+              <p class="text-xs text-slate-400 mt-1">
+                اكتب <code class="code-font text-emerald-400 font-black">index.html</code> ثم اضغط الزر الأخضر <strong class="text-emerald-400">Commit changes</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-end">
+        <button onclick="goToStage(2)" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-sm shadow-md flex items-center gap-2 transition active:scale-95">
+          <span>التالي: إنشاء المستودع ورفع الملف</span>
+          <span>←</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STAGE 2: CREATING & UPLOADING REPO -->
+    <section id="stage-sec-2" class="stage-container glass-card rounded-3xl p-6 sm:p-8 hidden">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-lg">2</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">الخطوة الثانية: إنشاء المستودع ورفع الملف</h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-bold">المستودع (Repository) هو المجلد السحابي لحفظ مشروعك.</p>
+          </div>
+        </div>
+        <span class="text-3xl">📁</span>
+      </div>
+
+      <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+        <p class="font-bold text-white">
+          اتبع الخطوات البسيطة التالية على موقع <a href="https://github.com" target="_blank" class="text-sky-400 underline font-black">GitHub.com</a>:
+        </p>
+
+        <!-- GitHub New Repository Simulator -->
+        <div class="github-window p-4 sm:p-5 font-mono text-xs mb-4" dir="ltr">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-slate-400">
+            <span class="text-sky-400 font-bold">Create a new repository</span>
+            <span class="text-[10px]">github.com/new</span>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Repository name *</label>
+              <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-700">
+                <span class="text-slate-500 font-sans">langualearn1-cpu /</span>
+                <span class="text-emerald-400 font-bold">my-quiz-lesson</span>
+              </div>
+            </div>
+
+            <!-- Public Option Highlight -->
+            <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center gap-3">
+              <input type="radio" checked readonly class="accent-emerald-500 w-4 h-4">
+              <div>
+                <span class="text-emerald-400 font-bold text-xs block">Public (عام) ⚠️</span>
+                <span class="text-[10px] text-slate-400">Anyone on the internet can see this repository. (إجباري لـ GitHub Pages المجاني)</span>
+              </div>
+            </div>
+
+            <!-- Add a README Checkbox -->
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-700 flex items-center gap-3">
+              <input type="checkbox" checked readonly class="accent-sky-500 w-4 h-4">
+              <div>
+                <span class="text-sky-400 font-bold text-xs block">Add a README file ✓</span>
+                <span class="text-[10px] text-slate-400">يجعل المستودع جاهزاً فوراً لرفع الملف بالسحب والإفلات.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload Step -->
+        <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/60">
+          <h4 class="font-black text-sm text-white mb-2">طريقة رفع ملف index.html:</h4>
+          <ol class="space-y-2 list-decimal list-inside text-xs text-slate-300 font-medium">
+            <li>اضغط من أعلى المستودع على زر <span class="bg-slate-800 border border-slate-600 text-white px-2 py-0.5 rounded font-bold">Add file</span>.</li>
+            <li>اختر <span class="bg-sky-950 text-sky-300 border border-sky-600/40 px-2 py-0.5 rounded font-bold">Upload files</span>.</li>
+            <li>اسحب ملف <code class="code-font text-emerald-400 font-bold">index.html</code> وأفلته في المربع.</li>
+            <li>انزل لأسفل واضغط الزر الأخضر: <span class="bg-emerald-600 text-white px-2.5 py-0.5 rounded font-bold">Commit changes</span>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between">
+        <button onclick="goToStage(1)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition">
+          → السابق
+        </button>
+        <button onclick="goToStage(3)" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm shadow-md flex items-center gap-2 transition active:scale-95">
+          <span>التالي: تفعيل خدمة GitHub Pages</span>
+          <span>←</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STAGE 3: ACTIVATING GITHUB PAGES -->
+    <section id="stage-sec-3" class="stage-container glass-card rounded-3xl p-6 sm:p-8 hidden">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-lg flex items-center justify-center shadow-lg">3</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">الخطوة الثالثة: تفعيل خادم GitHub Pages</h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-bold">هذه الخطوة تطلب من خادم GitHub تحويل كودك إلى موقع حي يعمل بالمتصفح.</p>
+          </div>
+        </div>
+        <span class="text-3xl">⚙️</span>
+      </div>
+
+      <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+        <p class="font-bold text-white">
+          داخل صفحة المستودع نفسه، نفذ هذه النقرات الثلاث بالترتيب:
+        </p>
+
+        <!-- Visual simulation of GitHub Tabs -->
+        <div class="github-window p-4 rounded-2xl font-mono text-xs mb-4" dir="ltr">
+          <div class="flex items-center gap-3 border-b border-slate-800 pb-2 mb-3 text-slate-400 overflow-x-auto">
+            <span class="text-slate-400">📁 &lt;&gt; Code</span>
+            <span class="text-slate-500">Issues</span>
+            <span class="text-slate-500">Pull requests</span>
+            <span class="text-slate-500">Actions</span>
+            <span class="text-amber-400 font-bold bg-slate-800 px-2 py-0.5 rounded border border-amber-500">⚙️ Settings (1. اضغط هنا)</span>
+          </div>
+
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <div class="flex items-center gap-2 text-slate-300">
+              <span class="text-slate-500">القائمة الجانبية اليسرى:</span>
+              <span>General</span>
+              <span>➔</span>
+              <span class="text-emerald-400 font-bold bg-slate-800 px-2 py-0.5 rounded border border-emerald-500">📄 Pages (2. اضغط هنا)</span>
+            </div>
+
+            <!-- Branch selection row -->
+            <div class="p-3 rounded-lg bg-slate-900 border border-slate-700 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span class="text-slate-400 block text-[11px]">Branch:</span>
+                <span class="text-slate-300 text-xs">غيّر من None إلى:</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="bg-slate-800 px-3 py-1 rounded border border-emerald-500 text-emerald-400 font-bold">main ✓</span>
+                <span class="bg-slate-800 px-2.5 py-1 rounded text-slate-400">/ (root)</span>
+                <button onclick="simulateSaveSuccess()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg font-bold shadow-md transition active:scale-95">
+                  Save (3. اضغط حفظ)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ol class="space-y-2 list-decimal list-inside text-xs sm:text-sm text-slate-300 font-bold">
+          <li>اضغط على <strong>Settings (الإعدادات ⚙️)</strong> من الشريط العلوي للمستودع في أقصى اليمين.</li>
+          <li>من القائمة الجانبية في اليسار، انزل واضغط على <strong>Pages</strong>.</li>
+          <li>تحت قسم <strong>Branch</strong>، غيّر من <code class="code-font text-rose-400">None</code> إلى <code class="code-font text-emerald-400">main</code>، ثم اضغط على زر <strong>Save</strong> الأزرق.</li>
+        </ol>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between">
+        <button onclick="goToStage(2)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition">
+          → السابق
+        </button>
+        <button onclick="goToStage(4)" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-md flex items-center gap-2 transition active:scale-95">
+          <span>التالي: أين يظهر الشريط الملون والرابط</span>
+          <span>←</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STAGE 4: THE COLORFUL BANNER & ACCESSING THE LIVE LINK -->
+    <section id="stage-sec-4" class="stage-container glass-card rounded-3xl p-6 sm:p-8 hidden">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-teal-500 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg">4</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">الخطوة الرابعة: مكان ظهور الشريط الملون وفتح الرابط</h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-bold">هنا تجد رابطك النهائي وتفتحه وترسله للطلاب.</p>
+          </div>
+        </div>
+        <span class="text-3xl">🌐</span>
+      </div>
+
+      <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+        <!-- Waiting time warning -->
+        <div class="p-4 rounded-2xl bg-amber-950/60 border border-amber-500/40 flex items-center gap-3.5">
+          <span class="text-3xl shrink-0">⏳</span>
+          <div>
+            <h4 class="font-black text-amber-300 text-sm">سر مهم: الرابط لا يظهر في نفس الثانية!</h4>
+            <p class="text-xs text-amber-100 font-medium mt-0.5 leading-relaxed">
+              بمجرد الضغط على <em>Save</em>، يحتاج خادم GitHub من <strong>30 إلى 90 ثانية</strong> لبناء الموقع لأول مرة.<br>
+              <strong>ماذا تفعل؟</strong> انتظر دقيقة واحدة، ثم اضغط على زر تحديث الصفحة في متصفحك (<span class="code-font text-amber-300 font-black bg-slate-950 px-2 py-0.5 rounded border border-amber-500/40">Refresh / F5</span>).
+            </p>
+          </div>
+        </div>
+
+        <h4 class="font-black text-base text-white mt-2">شكل ومكان الشريط الملون بعد التحديث:</h4>
+        <p class="text-xs text-slate-400">
+          ستجد الشريط في <strong>أعلى نفس صفحة Pages</strong> (فوق صندوق Branch مباشرة)؛ إليك شكله التوضيحي المطابق للواقع:
+        </p>
+
+        <!-- Simulated Live Link Banner -->
+        <div class="p-5 rounded-2xl bg-emerald-950/70 border-2 border-emerald-400/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl pulse-live-badge">
+          <div class="flex items-center gap-3.5" dir="ltr">
+            <span class="text-3xl">🎉</span>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-400 block tracking-wider">Your site is live at:</span>
+              <span id="bannerSampleUrl" class="code-font text-sm sm:text-base font-black text-white underline decoration-emerald-400">
+                https://langualearn1-cpu.github.io/my-quiz-lesson/
+              </span>
+            </div>
+          </div>
+          <button onclick="testLinkConfetti()" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg transition active:scale-95 shrink-0 flex items-center gap-2">
+            <span>🔗 Visit site</span>
+            <span>(فتح الرابط)</span>
+          </button>
+        </div>
+
+        <!-- Next Actions Card -->
+        <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-700/80 space-y-2 mt-4">
+          <h5 class="font-black text-white text-sm">ماذا تفعل بعد فتح الرابط؟</h5>
+          <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+            <li><strong>افحص الصفحة:</strong> ستفتح معك صفحة الويب التفاعلية كاملة بالأصوات والتنسيقات.</li>
+            <li><strong>شارك الرابط:</strong> انسخ الرابط من شريط عنوان المتصفح، وارسله لطلابك؛ سيعمل معهم على أي جوال أو جهاز لوحي فوراً بدون تسجيل دخول!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between">
+        <button onclick="goToStage(3)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition">
+          → السابق
+        </button>
+        <button onclick="goToStage(5)" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm shadow-md flex items-center gap-2 transition active:scale-95">
+          <span>التالي: حاسبة الرابط المباشر لمستودعك</span>
+          <span>←</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STAGE 5: LIVE URL CALCULATOR & DIRECT GENERATOR -->
+    <section id="stage-sec-5" class="stage-container glass-card rounded-3xl p-6 sm:p-8 hidden">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-purple-600 text-white font-black text-lg flex items-center justify-center shadow-lg">🧮</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">حاسبة الرابط المباشر لمستودعك (URL Calculator)</h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-bold">أدخل اسم حسابك واسم المستودع لتنسخ وتفتح رابطك الحقيقي فوراً:</p>
+          </div>
+        </div>
+        <span class="text-3xl">📋</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-black text-slate-300 mb-1.5">اسم حسابك على GitHub (Username):</label>
+          <input type="text" id="calcUsername" oninput="calculateUserUrl()" value="langualearn1-cpu" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-purple-400 focus:outline-none code-font text-sm text-left font-bold text-white" dir="ltr">
+        </div>
+        <div>
+          <label class="block text-xs font-black text-slate-300 mb-1.5">اسم المستودع (Repository name):</label>
+          <input type="text" id="calcRepo" oninput="calculateUserUrl()" value="english-grammar-practice" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-purple-400 focus:outline-none code-font text-sm text-left font-bold text-white" dir="ltr">
+        </div>
+      </div>
+
+      <!-- Live Result Display Card -->
+      <div class="p-5 rounded-2xl bg-slate-950 border-2 border-purple-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner">
+        <div class="text-left w-full sm:w-auto overflow-x-auto" dir="ltr">
+          <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">رابط موقعك المباشر سيكون بالضبط:</span>
+          <span id="liveCalculatedUrl" class="code-font text-sm sm:text-base font-black text-emerald-400">
+            https://langualearn1-cpu.github.io/english-grammar-practice/
+          </span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+          <button onclick="copyCalculatedUrl()" class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+            <span>📋</span>
+            <span id="copyBtnText">نسخ الرابط</span>
+          </button>
+          <button onclick="openCalculatedUrl()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white text-xs font-bold transition active:scale-95" title="تجربة فتح الرابط في نافذة جديدة">
+            ↗️ فتح
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Sub-Lessons Links Explanation -->
+      <div class="mt-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+        <h5 class="font-black text-xs sm:text-sm text-sky-400 mb-1">💡 كيف تفتح درساً فرعياً (مثلاً ملف باسم past-simple.html)؟</h5>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          فقط أضف اسم الملف في نهاية الرابط هكذا:<br>
+          <code id="subLessonUrlDemo" class="code-font text-xs text-purple-300 bg-slate-950 px-2 py-0.5 rounded mt-1 inline-block" dir="ltr">
+            https://langualearn1-cpu.github.io/english-grammar-practice/past-simple.html
+          </code>
+        </p>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between">
+        <button onclick="goToStage(4)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs transition">
+          → السابق
+        </button>
+        <button onclick="goToStage(1)" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-sm shadow-md transition active:scale-95">
+          العودة للبداية ↺
+        </button>
+      </div>
+    </section>
+
+    <!-- COMMON PITFALLS & INSTANT DIAGNOSTIC -->
+    <section class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-700/80">
+      <h3 class="text-base sm:text-lg font-black text-white mb-4 flex items-center gap-2">
+        <span>⚠️</span>
+        <span>أهم 3 أخطاء تمنع ظهور الرابط وكيف تحلها فوراً:</span>
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Pitfall 1 -->
+        <div class="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-rose-300 font-black text-xs sm:text-sm mb-1.5">
+              <span>🚫</span>
+              <span>1. خطأ 404 Not Found</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              <strong>السبب:</strong> اسم الملف ليس <code class="code-font text-rose-300">index.html</code> بالضبط، أو أنك استعجلت ولم تنتظر دقيقة حتى يكتمل البناء.
+            </p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-rose-500/20 text-[11px] font-bold text-rose-400">
+            ✓ الحل: أعد تسمية الملف إلى index.html وانتظر دقيقة.
+          </div>
+        </div>
+
+        <!-- Pitfall 2 -->
+        <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-amber-300 font-black text-xs sm:text-sm mb-1.5">
+              <span>🔒</span>
+              <span>2. المستودع خاص (Private)</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              <strong>السبب:</strong> ميزة GitHub Pages المجانية تعمل فقط عندما يكون المستودع عاماً (<code class="code-font text-amber-300">Public</code>).
+            </p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-amber-500/20 text-[11px] font-bold text-amber-400">
+            ✓ الحل: من Settings غيّر الخصوصية إلى Public.
+          </div>
+        </div>
+
+        <!-- Pitfall 3 -->
+        <div class="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-sky-300 font-black text-xs sm:text-sm mb-1.5">
+              <span>🔄</span>
+              <span>3. التعديلات لا تظهر</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              <strong>السبب:</strong> ذاكرة التخزين المؤقت للمتصفح (Cache) تحتفظ بالنسخة القديمة.
+            </p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-sky-500/20 text-[11px] font-bold text-sky-400">
+            ✓ الحل: اضغط Ctrl + Shift + R للتحديث الإجباري.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Footer Note -->
+    <footer class="text-center text-xs font-bold text-slate-500 py-3">
+      أداة ومحاكي تحويل ونشر ملفات الويب • GitHub Pages Assistant 🌐
+    </footer>
+
+  </div>
+
+  <!-- Notification Toast Modal -->
+  <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 transform translate-y-28 opacity-0">
+    <div class="bg-slate-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl border-2 border-sky-400 flex items-center gap-3 backdrop-blur-md">
+      <span id="toastIcon" class="text-2xl">✨</span>
+      <div>
+        <p id="toastTitle" class="text-sm font-black text-white"></p>
+        <p id="toastMsg" class="text-xs text-slate-300 font-medium"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. WEB AUDIO SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+       ========================================================================= */
+    class AudioFX {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playPop() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+      playSuccess() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+          gain.gain.setValueAtTime(0.001, now + idx * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.07 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.07);
+          osc.stop(now + idx * 0.07 + 0.25);
+        });
+      }
+    }
+    const sfx = new AudioFX();
+
+    /* =========================================================================
+       2. STAGE NAVIGATION LOGIC
+       ========================================================================= */
+    function goToStage(num) {
+      sfx.playPop();
+      document.querySelectorAll('.stage-container').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.step-nav-btn').forEach(b => b.classList.remove('active-tab'));
+
+      const sec = document.getElementById(`stage-sec-${num}`);
+      const btn = document.getElementById(`stage-btn-${num}`);
+
+      if (sec) sec.classList.remove('hidden');
+      if (btn) btn.classList.add('active-tab');
+
+      if (sec) {
+        sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    /* =========================================================================
+       3. FILENAME VALIDATION & FIX TOOL
+       ========================================================================= */
+    function validateFileName() {
+      const val = document.getElementById('testFileNameInput').value.trim();
+      const fb = document.getElementById('fileNameFeedback');
+
+      if (val === 'index.html') {
+        fb.innerHTML = `<span>✅ اسم مثالي وممتاز! سيفتح موقعك تلقائياً وبشكل مباشر.</span>`;
+        fb.className = "mt-2.5 text-xs font-bold text-emerald-400 flex items-center gap-1.5";
+      } else if (val.endsWith('.html')) {
+        fb.innerHTML = `<span>⚠️ الاسم (${val}) لن يفتح تلقائياً كرابط رئيسي، بل سيحتاج كتابة اسمه في نهاية الرابط. يفضل تغييره إلى index.html.</span>`;
+        fb.className = "mt-2.5 text-xs font-bold text-amber-400 flex items-center gap-1.5";
+      } else {
+        fb.innerHTML = `<span>❌ خطأ: يجب أن ينتهي الملف بامتداد (.html) وليس بامتداد آخر.</span>`;
+        fb.className = "mt-2.5 text-xs font-bold text-rose-400 flex items-center gap-1.5";
+      }
+    }
+
+    function fixFileNameAuto() {
+      sfx.playSuccess();
+      document.getElementById('testFileNameInput').value = 'index.html';
+      validateFileName();
+      showToast(true, "تم التصحيح إلى index.html بنجاح!", "هذا هو الاسم المطلوب دائماً للواجهة الرئيسية.");
+    }
+
+    /* =========================================================================
+       4. URL CALCULATOR & SIMULATORS
+       ========================================================================= */
+    function calculateUserUrl() {
+      let user = document.getElementById('calcUsername').value.trim();
+      let repo = document.getElementById('calcRepo').value.trim();
+
+      if (!user) user = "username";
+      if (!repo) repo = "repo-name";
+
+      user = user.replace(/\s+/g, '-');
+      repo = repo.replace(/\s+/g, '-');
+
+      const url = `https://${user}.github.io/${repo}/`;
+      document.getElementById('liveCalculatedUrl').textContent = url;
+      document.getElementById('bannerSampleUrl').textContent = url;
+      document.getElementById('subLessonUrlDemo').textContent = `https://${user}.github.io/${repo}/past-simple.html`;
+    }
+
+    function copyCalculatedUrl() {
+      sfx.playPop();
+      const url = document.getElementById('liveCalculatedUrl').textContent.trim();
+      
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        sfx.playSuccess();
+        confetti({ particleCount: 50, spread: 60 });
+        showToast(true, "تم نسخ الرابط بنجاح!", url);
+        document.getElementById('copyBtnText').textContent = "تم النسخ ✓";
+        setTimeout(() => {
+          document.getElementById('copyBtnText').textContent = "نسخ الرابط";
+        }, 2200);
+      } catch (err) {
+        showToast(false, "يرجى نسخ الرابط يدوياً", url);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function openCalculatedUrl() {
+      sfx.playPop();
+      const url = document.getElementById('liveCalculatedUrl').textContent.trim();
+      window.open(url, '_blank');
+    }
+
+    function testLinkConfetti() {
+      sfx.playSuccess();
+      confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+      showToast(true, "مبارك! هذا هو الرابط الحي لموقعك.", "شاركه مع طلابك وسيعمل على هواتفهم فوراً.");
+    }
+
+    function simulateSaveSuccess() {
+      sfx.playSuccess();
+      confetti({ particleCount: 40, spread: 50 });
+      showToast(true, "تم حفظ الإعداد بنجاح!", "انتظر دقيقة واحدة ثم حدّث الصفحة لرؤية الشريط الملون.");
+    }
+
+    /* =========================================================================
+       5. SAFE TOAST NOTIFICATION HANDLER
+       ========================================================================= */
+    function showToast(isSuccess, title, message) {
+      const toast = document.getElementById('toastNotification');
+      if (!toast) return;
+
+      const titleEl = document.getElementById('toastTitle');
+      const msgEl = document.getElementById('toastMsg');
+      const iconEl = document.getElementById('toastIcon');
+
+      iconEl.textContent = isSuccess ? "✅" : "⚠️";
+      titleEl.textContent = title;
+      msgEl.textContent = message;
+
+      toast.classList.remove('translate-y-28', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-28', 'opacity-0');
+      }, 3000);
+    }
+
+    window.onload = function() {
+      calculateUserUrl();
+    };
+  </script>
+</body>
+</html>
